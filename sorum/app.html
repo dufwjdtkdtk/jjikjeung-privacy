@@ -697,6 +697,10 @@ const actions = {
   }
 };
 
+// 뒤로가기 버튼(안드로이드 앱·브라우저): 게임 중이면 첫 화면으로 돌아가요
+function enterGame() { try { if (!(history.state && history.state.game)) history.pushState({ game: 1 }, ""); } catch (e) {} }
+window.addEventListener("popstate", () => { if (S.screen !== "home") { readName(); S.screen = "home"; render(); } });
+
 app.addEventListener("click", e => {
   const set = e.target.closest("[data-set]");
   if (set) {
@@ -710,6 +714,9 @@ app.addEventListener("click", e => {
   const btn = e.target.closest("[data-act]");
   if (!btn) return;
   const fn = actions[btn.dataset.act];
+  const act = btn.dataset.act;
+  if (act === "home" && history.state && history.state.game) { try { history.back(); return; } catch (err) {} }
+  if (S.screen === "home" && act !== "home") enterGame();
   if (fn && fn(btn) !== false) render();
 });
 app.addEventListener("keydown", e => {
